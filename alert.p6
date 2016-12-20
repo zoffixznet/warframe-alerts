@@ -2,7 +2,6 @@
 use lib <
     /home/zoffix/CPANPRC/IRC-Client/lib
     /home/zoffix/services/lib/IRC-Client/lib
-    lib
 >;
 
 constant API_URL = "http://content.warframe.com/dynamic/rss.php";
@@ -27,7 +26,7 @@ class WA::Info is IRC::Client::Plugin {
                         next unless $_<item>.Str.contains('Nitain');
                         note "Found Nitain in data!";
 
-                        $_<item>.match: /'<guid>' $<id>=\S+ '</guid>'/;
+                        $_<item>.match: /'<guid>' $<id>=\S+? '</guid>'/;
                         next if %seen{~$<id>}:exists;
                         %seen{~$<id>} = +now;
                         %seen{
@@ -46,12 +45,12 @@ class WA::Info is IRC::Client::Plugin {
 }
 
 # await WA::Info.new.irc-started; exit;
-
 .run with IRC::Client.new:
     :nick<WarframeAlerter>,
     :host(%*ENV<WA_IRC_HOST> // 'irc.freenode.net'),
     :channels<#zofbot>,
     :debug,
+    :password('pass.txt'.IO.slurp.trim // ''),
     :plugins(
         WA::Info.new,
     );
