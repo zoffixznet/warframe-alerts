@@ -19,7 +19,6 @@ class WA::Info is IRC::Client::Plugin {
                 given HTTP::UserAgent.new.get(API_URL) {
                     when *.is-success.not {
                         note "Failed to fetch API data: {.status-line}";
-                        return;
                     }
 
                     for |.content.match(:g, /'<item>' $<item>=.+? '</item>'/) {
