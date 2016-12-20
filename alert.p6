@@ -26,12 +26,12 @@ class WA::Info is IRC::Client::Plugin {
                         next unless $_<item>.Str.contains('Nitain');
                         note "Found Nitain in data!";
 
-                        $_<item>.match: /'<guid>' $<id>=\S+? '</guid>'/;
-                        next if %seen{~$<id>}:exists;
+                        $_<item>.match: /'<guid>' $<id>=\S+? '</guid>'/
+                            and %seen{~$<id>}:!exists
+                            or next;
+
                         %seen{~$<id>} = +now;
-                        %seen{
-                            %seen.grep(*.value < ( now - 3600))».key
-                        }:delete;
+                        %seen{ %seen.grep(*.value < (now-3600))».key }:delete;
 
                         note "Notifying about found Nitain";
                         $.irc.?send: :where<#zofbot> :text("Zoffix, Nitain!!!");
