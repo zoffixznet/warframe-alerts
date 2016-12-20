@@ -13,28 +13,26 @@ class WA::Info is IRC::Client::Plugin {
     my %seen;
     multi method irc-started { start {
         %*ENV<WA_DEBUG> or sleep 30; # give a chance to boot
-        react {
-            whenever Supply.interval(5*60) {
-                note "Starting run at {DateTime.now}";
-                given HTTP::UserAgent.new.get(API_URL) {
-                    when *.is-success.not {
-                        note "Failed to fetch API data: {.status-line}";
-                    }
 
-                    for |.content.match(:g, /'<item>' $<item>=.+? '</item>'/) {
-                        next unless $_<item>.Str.contains('Nitain');
-                        note "Found Nitain in data!";
+        Supply.interval(5*60).tap: {
+            note "Starting run at {DateTime.now}";
+            given HTTP::UserAgent.new.get(API_URL) {
+                when *.is-success.not
+                    {note "Failed to fetch API data: {.status-line}"}
 
-                        $_<item>.match: /'<guid>' $<id>=\S+? '</guid>'/
-                            and %seen{~$<id>}:!exists
-                            or next;
+                for |.content.match(:g, /'<item>' $<item>=.+? '</item>'/) {
+                    next unless .<item>.Str.contains('Elite');
+                    note "Found Nitain in data!";
 
-                        %seen{~$<id>} = +now;
-                        %seen{ %seen.grep(*.value < (now - 3600))».key }:delete;
+                    .<item>.match: /'<guid>' $<id>=\S+? '</guid>'/
+                        and %seen{~$<id>}:!exists
+                        or next;
 
-                        note "Notifying about found Nitain";
-                        $.irc.?send: :where<#zofbot> :text("Zoffix, Nitain!!!");
-                    }
+                    %seen{ %seen.grep(*.value < (now - 3600))».key }:delete;
+                    %seen{~$<id>} = now;
+
+                    note "Notifying about found Nitain";
+                    $.irc.?send: :where<#zofbot> :text("Zoffix, Nitain!!!");
                 }
             }
         }
