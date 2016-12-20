@@ -21,7 +21,7 @@ class WA::Info is IRC::Client::Plugin {
                     {note "Failed to fetch API data: {.status-line}"}
 
                 for |.content.match(:g, /'<item>' $<item>=.+? '</item>'/) {
-                    next unless .<item>.Str.contains('Elite');
+                    next unless .<item>.Str.contains('Nitain');
                     note "Found Nitain in data!";
 
                     .<item>.match: /'<guid>' $<id>=\S+? '</guid>'/
