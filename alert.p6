@@ -30,7 +30,7 @@ class WA::Info is IRC::Client::Plugin {
                             or next;
 
                         %seen{~$<id>} = +now;
-                        %seen{ %seen.grep(*.value < (now-3600))».key }:delete;
+                        %seen{ %seen.grep(*.value < (now - 3600))».key }:delete;
 
                         note "Notifying about found Nitain";
                         $.irc.?send: :where<#zofbot> :text("Zoffix, Nitain!!!");
