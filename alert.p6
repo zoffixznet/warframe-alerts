@@ -24,8 +24,7 @@ class WA::Info is IRC::Client::Plugin {
                     }
 
                     for |.content.match(:g, /'<item>' $<item>=.+? '</item>'/) {
-                        dd $_<item>.Str;
-                        next unless $_<item>.Str.contains('Mutagen');
+                        next unless $_<item>.Str.contains('Nitain');
                         note "Found Nitain in data!";
 
                         $_<item>.match: /'<guid>' $<id>=\S+ '</guid>'/;
